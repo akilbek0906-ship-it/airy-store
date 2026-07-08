@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirySkin Store</title>
-    <!-- Подключаем скрипт Телеграма, чтобы сайт мог общаться с ботом -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -37,40 +36,58 @@
             font-weight: bold;
         }
         .btn:hover { background-color: #0063cc; }
+        .btn:disabled { background-color: #444; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <h1>AirySkin Store</h1>
 
+    <!--
+        Цены здесь показаны ТОЛЬКО для покупателя, чтобы он видел, что покупает.
+        Реальная цена, которая пойдет в заказ, хранится на сервере (в bot.py),
+        а не берётся из этой страницы. Так подделать сумму заказа нельзя.
+    -->
+
     <div class="product-card">
-        <h3>Товар 1 (например, Одежда)</h3>
-        <div class="price">5000 ₸</div>
-        <button class="btn" onclick="sendOrder('Товар 1', '5000')">Купить</button>
+        <h3>Футболка Airy Classic</h3>
+        <div class="price">8500 ₸</div>
+        <button class="btn" onclick="sendOrder('product_1')">Купить</button>
     </div>
 
     <div class="product-card">
-        <h3>Товар 2 (например, Текстиль)</h3>
-        <div class="price">8500 ₸</div>
-        <button class="btn" onclick="sendOrder('Товар 2', '8500')">Купить</button>
+        <h3>Худи Airy Skin Черное</h3>
+        <div class="price">14500 ₸</div>
+        <button class="btn" onclick="sendOrder('product_2')">Купить</button>
+    </div>
+
+    <div class="product-card">
+        <h3>Кепка Airy Cap</h3>
+        <div class="price">5500 ₸</div>
+        <button class="btn" onclick="sendOrder('product_3')">Купить</button>
     </div>
 
     <script>
-        // Инициализируем WebApp Телеграма
         const tg = window.Telegram.WebApp;
-        tg.ready(); // Говорим ТГ, что приложение загрузилось
+        tg.ready();
+        tg.expand();
 
-        function sendOrder(productName, price) {
-            // Создаем объект с данными заказа
+        function sendOrder(productId) {
+            const contact = prompt("Введите ваш Telegram ник или номер телефона:");
+            if (!contact || !contact.trim()) return;
+
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = "Отправляем...";
+
+            // Отправляем ТОЛЬКО id товара и контакт.
+            // Никаких токенов и цен внутри этой страницы нет — и не должно быть.
             const data = {
-                product: productName,
-                price: price
+                product_id: productId,
+                contact: contact.trim()
             };
-            
-            // Отправляем данные в бот (переводим объект в строку текста)
+
             tg.sendData(JSON.stringify(data));
-            
-            // Закрываем мини-апп после клика
             tg.close();
         }
     </script>
